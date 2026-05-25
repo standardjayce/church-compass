@@ -6,7 +6,7 @@ import { denominations } from "@/data/churches";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
 import { ChurchCard } from "@/components/church-card";
-import { MapPin, Church, Search } from "lucide-react";
+import { MapPin, Church as ChurchIcon, Search } from "lucide-react";
 import { getChurches } from "@/lib/churchQueries";
 import type { Church } from "@/types/church";
 
@@ -69,7 +69,7 @@ function Index() {
                   to="/about"
                   className="h-11 px-5 bg-transparent text-emerald-deep text-sm font-medium border border-emerald-deep/20 rounded-sm hover:border-emerald-deep transition-colors flex items-center gap-2"
                 >
-                  <Church className="w-4 h-4" />
+                  <ChurchIcon className="w-4 h-4" />
                   Claim Your Church Profile
                 </Link>
               </div>
