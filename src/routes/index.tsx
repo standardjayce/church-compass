@@ -1,11 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import heroImg from "@/assets/hero-sanctuary.jpg";
-import { churches, denominations } from "@/data/churches";
+import { denominations } from "@/data/churches";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
 import { ChurchCard } from "@/components/church-card";
 import { MapPin, Church, Search } from "lucide-react";
+import { getChurches } from "@/lib/churchQueries";
+import type { Church } from "@/types/church";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -24,7 +27,18 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const featured = churches.slice(0, 3);
+  const [featured, setFeatured] = useState<Church[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchFeatured = async () => {
+      setLoading(true);
+      const { churches } = await getChurches({ featured: true, limit: 3 });
+      setFeatured(churches);
+      setLoading(false);
+    };
+    fetchFeatured();
+  }, []);
   return (
     <div className="bg-cream text-emerald-deep selection:bg-gold/30 min-h-screen">
       <SiteNav />
@@ -157,11 +171,17 @@ function Index() {
             </Link>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-12">
-            {featured.map((c) => (
-              <ChurchCard key={c.slug} church={c} />
-            ))}
-          </div>
+          {loading ? (
+            <div className="py-12 text-center text-emerald-deep/60">Loading featured churches...</div>
+          ) : featured.length > 0 ? (
+            <div className="grid md:grid-cols-3 gap-12">
+              {featured.map((c) => (
+                <ChurchCard key={c.slug} church={c} />
+              ))}
+            </div>
+          ) : (
+            <div className="py-12 text-center text-emerald-deep/60">No featured churches yet.</div>
+          )}
         </div>
       </section>
 

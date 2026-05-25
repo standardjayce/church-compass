@@ -1,12 +1,12 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { churches } from "@/data/churches";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
+import { getChurchBySlug } from "@/lib/churchQueries";
 
 export const Route = createFileRoute("/church/$slug")({
-  loader: ({ params }) => {
-    const church = churches.find((c) => c.slug === params.slug);
-    if (!church) throw notFound();
+  loader: async ({ params }) => {
+    const { church, error } = await getChurchBySlug(params.slug);
+    if (!church || error) throw notFound();
     return { church };
   },
   head: ({ loaderData }) => {
@@ -18,11 +18,15 @@ export const Route = createFileRoute("/church/$slug")({
     return {
       meta: [
         { title: `${c.name} — Church Compass` },
-        { name: "description", content: c.description },
+        { name: "description", content: c.description || "" },
         { property: "og:title", content: `${c.name} — Church Compass` },
-        { property: "og:description", content: c.description },
-        { property: "og:image", content: c.image },
-        { name: "twitter:image", content: c.image },
+        { property: "og:description", content: c.description || "" },
+        ...(c.profile_image_url
+          ? [
+              { property: "og:image", content: c.profile_image_url },
+              { name: "twitter:image", content: c.profile_image_url },
+            ]
+          : []),
       ],
     };
   },
@@ -63,20 +67,24 @@ function ChurchDetail() {
           <Link to="/directory" className="text-xs uppercase tracking-widest text-emerald-deep/50 hover:text-gold">
             ← Directory
           </Link>
-          <p className="text-xs font-semibold uppercase tracking-widest text-gold mt-12 mb-6">{church.tagline}</p>
+          {church.worship_style && (
+            <p className="text-xs font-semibold uppercase tracking-widest text-gold mt-12 mb-6">{church.worship_style}</p>
+          )}
           <h1 className="font-serif text-5xl md:text-7xl leading-none mb-6">{church.name}</h1>
           <p className="text-emerald-deep/70 text-lg max-w-[56ch] mb-12">{church.description}</p>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 py-8 border-y border-emerald-deep/10 mb-16 text-sm">
-            <Stat label="Tradition" value={church.denomination} />
-            <Stat label="Size" value={church.size} />
-            <Stat label="Style" value={church.style} />
-            <Stat label="City" value={church.city} />
+            <Stat label="Tradition" value={church.denomination || "Not specified"} />
+            {church.worship_style && <Stat label="Style" value={church.worship_style} />}
+            <Stat label="City" value={`${church.city}, ${church.state}`} />
+            {church.address && <Stat label="Address" value={church.address} />}
           </div>
 
-          <div className="aspect-[16/10] overflow-hidden rounded-[min(1vw,12px)]">
-            <img src={church.image} alt={church.imageAlt} className="w-full h-full object-cover" />
-          </div>
+          {church.profile_image_url && (
+            <div className="aspect-[16/10] overflow-hidden rounded-[min(1vw,12px)]">
+              <img src={church.profile_image_url} alt={church.name} className="w-full h-full object-cover" />
+            </div>
+          )}
 
           <div className="mt-16 grid md:grid-cols-3 gap-12">
             <div className="md:col-span-2 space-y-6 text-emerald-deep/80 leading-relaxed">

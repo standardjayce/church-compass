@@ -1,10 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { z } from "zod";
-import { churches, denominations } from "@/data/churches";
+import { denominations } from "@/data/churches";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
 import { ChurchCard } from "@/components/church-card";
+import { getChurches } from "@/lib/churchQueries";
+import type { Church } from "@/types/church";
 
 const searchSchema = z.object({
   denom: z.string().optional(),
@@ -32,13 +34,25 @@ function Directory() {
   const { denom, q } = Route.useSearch();
   const navigate = Route.useNavigate();
   const [query, setQuery] = useState(q ?? "");
+  const [churches, setChurches] = useState<Church[]>([]);
+  const [loading, setLoading] = useState(true);
   const activeDenom = denom ?? "All";
+
+  useEffect(() => {
+    const fetchChurches = async () => {
+      setLoading(true);
+      const { churches: data } = await getChurches({ limit: 100 });
+      setChurches(data);
+      setLoading(false);
+    };
+    fetchChurches();
+  }, []);
 
   const filtered = churches.filter((c) => {
     const matchDenom = activeDenom === "All" || c.denomination === activeDenom;
     const matchQuery =
       !query.trim() ||
-      `${c.name} ${c.city} ${c.denomination} ${c.style}`
+      `${c.name} ${c.city} ${c.denomination} ${c.worship_style || ""}`
         .toLowerCase()
         .includes(query.toLowerCase());
     return matchDenom && matchQuery;
@@ -100,28 +114,36 @@ function Directory() {
 
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-6">
-          <p className="text-xs uppercase tracking-widest text-emerald-deep/40 mb-10">
-            {filtered.length} {filtered.length === 1 ? "church" : "churches"}
-          </p>
-          {filtered.length === 0 ? (
+          {loading ? (
             <div className="py-24 text-center">
-              <p className="font-serif text-2xl mb-4">No matches yet.</p>
-              <p className="text-sm text-emerald-deep/60 mb-8">
-                Try adjusting your filters or take the quiz for a personalized match.
-              </p>
-              <Link
-                to="/quiz"
-                className="inline-block px-6 py-3 bg-emerald-deep text-cream text-sm rounded-sm hover:bg-emerald-mid"
-              >
-                Take the quiz
-              </Link>
+              <p className="text-emerald-deep/60">Loading churches...</p>
             </div>
           ) : (
-            <div className="grid md:grid-cols-3 gap-12">
-              {filtered.map((c) => (
-                <ChurchCard key={c.slug} church={c} />
-              ))}
-            </div>
+            <>
+              <p className="text-xs uppercase tracking-widest text-emerald-deep/40 mb-10">
+                {filtered.length} {filtered.length === 1 ? "church" : "churches"}
+              </p>
+              {filtered.length === 0 ? (
+                <div className="py-24 text-center">
+                  <p className="font-serif text-2xl mb-4">No matches yet.</p>
+                  <p className="text-sm text-emerald-deep/60 mb-8">
+                    Try adjusting your filters or take the quiz for a personalized match.
+                  </p>
+                  <Link
+                    to="/quiz"
+                    className="inline-block px-6 py-3 bg-emerald-deep text-cream text-sm rounded-sm hover:bg-emerald-mid"
+                  >
+                    Take the quiz
+                  </Link>
+                </div>
+              ) : (
+                <div className="grid md:grid-cols-3 gap-12">
+                  {filtered.map((c) => (
+                    <ChurchCard key={c.slug} church={c} />
+                  ))}
+                </div>
+              )}
+            </>
           )}
         </div>
       </section>
