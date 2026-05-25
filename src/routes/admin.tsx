@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
@@ -57,7 +57,6 @@ function AdminPage() {
   );
 }
 
-// Admin password - set this in environment variable in production
 const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || "admin123";
 
 function validateAdminPassword(password: string): boolean {
@@ -69,6 +68,5 @@ function generateAdminToken(): string {
 }
 
 function isValidAdminToken(token: string): boolean {
-  // Simple token validation - in production, use proper JWT
   return typeof token === "string" && token.startsWith("admin_");
 }
