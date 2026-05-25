@@ -14,9 +14,12 @@ function AdminPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("admin_token");
-    if (token && isValidAdminToken(token)) {
-      setIsAuthenticated(true);
+    // localStorage is only available on client-side
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem("admin_token");
+      if (token && isValidAdminToken(token)) {
+        setIsAuthenticated(true);
+      }
     }
     setLoading(false);
   }, []);
@@ -24,7 +27,9 @@ function AdminPage() {
   const handleLogin = (password: string) => {
     if (validateAdminPassword(password)) {
       const token = generateAdminToken();
-      localStorage.setItem("admin_token", token);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem("admin_token", token);
+      }
       setIsAuthenticated(true);
       return true;
     }
@@ -32,7 +37,9 @@ function AdminPage() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("admin_token");
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem("admin_token");
+    }
     setIsAuthenticated(false);
   };
 
