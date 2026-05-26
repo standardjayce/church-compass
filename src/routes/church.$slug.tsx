@@ -1,4 +1,4 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
 import { getChurchBySlug } from "@/lib/churchQueries";
@@ -107,6 +107,15 @@ function ChurchDetail() {
               <button className="mt-4 w-full h-10 bg-gold text-emerald-deep text-sm font-medium rounded-sm hover:bg-gold-soft transition-colors">
                 Request an introduction
               </button>
+              <div className="pt-4 border-t border-cream/20">
+                <p className="text-xs uppercase tracking-widest text-cream/60 mb-2">Church leaders?</p>
+                <Link
+                  to="/claim"
+                  className="block text-center h-10 border border-gold text-gold text-sm font-medium rounded-sm hover:bg-gold/10 transition-colors flex items-center justify-center"
+                >
+                  Claim this profile
+                </Link>
+              </div>
             </aside>
           </div>
         </div>

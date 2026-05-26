@@ -66,7 +66,7 @@ function Index() {
                   Find Churches Near Me
                 </Link>
                 <Link
-                  to="/about"
+                  to="/claim"
                   className="h-11 px-5 bg-transparent text-emerald-deep text-sm font-medium border border-emerald-deep/20 rounded-sm hover:border-emerald-deep transition-colors flex items-center gap-2"
                 >
                   <ChurchIcon className="w-4 h-4" />
@@ -130,7 +130,7 @@ function Index() {
                 Thousands of people are searching for a church home every week. Claim your profile, share your story, and connect with families looking for a church just like yours.
               </p>
               <Link
-                to="/about"
+                to="/claim"
                 className="inline-block h-11 px-6 bg-gold text-emerald-deep text-sm font-medium rounded-sm hover:bg-gold-soft transition-colors leading-[2.75rem]"
               >
                 Claim Your Profile
