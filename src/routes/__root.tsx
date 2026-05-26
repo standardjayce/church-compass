@@ -7,6 +7,8 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { ensureDemoData } from "@/lib/autoSeed";
 
 import appCss from "../styles.css?url";
 import "@fontsource/instrument-serif/400.css";
@@ -116,6 +118,10 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+
+  useEffect(() => {
+    ensureDemoData();
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
