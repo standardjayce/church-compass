@@ -31,9 +31,9 @@ export function ContactForm({ church }: ContactFormProps) {
     try {
       const { message: msg, error: msgError } = await submitContactMessage({
         church_id: church.id,
-        sender_name: formData.senderName || null,
-        sender_email: formData.senderEmail || null,
-        sender_phone: formData.senderPhone || null,
+        sender_name: formData.senderName || undefined,
+        sender_email: formData.senderEmail || undefined,
+        sender_phone: formData.senderPhone || undefined,
         message: formData.message,
       });
 
