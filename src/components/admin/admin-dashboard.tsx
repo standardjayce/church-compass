@@ -1,19 +1,21 @@
 import { useState } from "react";
-import { LogOut, Plus, Inbox, CheckSquare, BarChart3 } from "lucide-react";
+import { LogOut, Plus, Inbox, CheckSquare, BarChart3, Upload } from "lucide-react";
 import { AdminChurches } from "./admin-churches";
 import { AdminClaims } from "./admin-claims";
 import { AdminMessages } from "./admin-messages";
 import { AdminStats } from "./admin-stats";
+import { AdminImport } from "./admin-import";
 
 interface AdminDashboardProps {
   onLogout: () => void;
 }
 
 export function AdminDashboard({ onLogout }: AdminDashboardProps) {
-  const [activeTab, setActiveTab] = useState<"churches" | "claims" | "messages" | "stats">("churches");
+  const [activeTab, setActiveTab] = useState<"churches" | "claims" | "messages" | "stats" | "import">("churches");
 
   const tabs = [
     { id: "churches", label: "Churches", icon: Plus },
+    { id: "import", label: "Import", icon: Upload },
     { id: "claims", label: "Claims", icon: CheckSquare },
     { id: "messages", label: "Messages", icon: Inbox },
     { id: "stats", label: "Statistics", icon: BarChart3 },
@@ -62,6 +64,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
         {/* Tab Content */}
         <div className="space-y-6">
           {activeTab === "churches" && <AdminChurches />}
+          {activeTab === "import" && <AdminImport />}
           {activeTab === "claims" && <AdminClaims />}
           {activeTab === "messages" && <AdminMessages />}
           {activeTab === "stats" && <AdminStats />}
