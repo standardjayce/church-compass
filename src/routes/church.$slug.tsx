@@ -1,6 +1,7 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
+import { ContactForm } from "@/components/contact-form";
 import { getChurchBySlug } from "@/lib/churchQueries";
 
 export const Route = createFileRoute("/church/$slug")({
@@ -117,6 +118,10 @@ function ChurchDetail() {
                 </Link>
               </div>
             </aside>
+          </div>
+
+          <div className="mt-20 pt-20 border-t border-emerald-deep/10">
+            <ContactForm church={church} />
           </div>
         </div>
       </article>
