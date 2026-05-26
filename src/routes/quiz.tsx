@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
-import { churches, type Church } from "@/data/churches";
+import { useMemo, useState, useEffect } from "react";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
 import { ChurchCard } from "@/components/church-card";
+import { getChurches } from "@/lib/churchQueries";
+import type { Church } from "@/types/church";
 
 export const Route = createFileRoute("/quiz")({
   head: () => ({
@@ -51,22 +52,39 @@ const questions = [
   },
 ];
 
-function score(a: Partial<Answer>): Church[] {
+function score(a: Partial<Answer>, churches: Church[]): Church[] {
+  const denominationMap: Record<string, string[]> = {
+    "Liturgical & ancient": ["Orthodox", "Anglican"],
+    "Anglican / Episcopal": ["Anglican"],
+    "Non-Denominational": ["Non-Denominational"],
+    "Reformed / Presbyterian": ["Presbyterian"],
+    "Open to anything": [],
+    "Not sure what these mean": [],
+  };
+
   return [...churches]
     .map((c) => {
       let s = 0;
-      if (a.tradition?.includes(c.denomination)) s += 3;
-      if (a.tradition === "Liturgical & ancient" && c.style === "Liturgical") s += 2;
+
+      // Tradition scoring
+      const allowedDenoms = denominationMap[a.tradition || ""] || [];
+      if (allowedDenoms.length > 0 && allowedDenoms.includes(c.denomination || "")) s += 3;
+      if (a.tradition === "Liturgical & ancient" && c.worship_style === "Liturgical") s += 2;
       if (a.tradition === "Open to anything") s += 1;
       if (a.tradition === "Not sure what these mean") s += 1;
-      if (a.style === "Choral & contemplative" && c.style === "Liturgical") s += 2;
-      if (a.style === "Modern band" && c.style === "Contemporary") s += 2;
-      if (a.style === "Traditional hymns" && c.style === "Traditional") s += 2;
-      if (a.size === c.size) s += 2;
-      if (a.size === "It doesn’t matter") s += 1;
-      if (a.focus === "Arts & beauty" && c.tagline.includes("Arts")) s += 2;
-      if (a.focus === "Family & youth" && c.tagline.includes("Family")) s += 2;
-      if (a.focus === "Justice & service" && /justice|hospitality/i.test(c.description)) s += 2;
+
+      // Worship style scoring
+      if (a.style === "Choral & contemplative" && c.worship_style === "Liturgical") s += 2;
+      if (a.style === "Modern band" && c.worship_style === "Contemporary") s += 2;
+      if (a.style === "Traditional hymns" && c.worship_style === "Traditional") s += 2;
+
+      // Ministry focus scoring
+      if (a.focus === "Family & youth" && (c.kids_ministry || c.youth_ministry)) s += 2;
+      if (a.focus === "Justice & service" && c.description?.match(/justice|service|community|outreach/i)) s += 2;
+
+      // Welcome pace
+      if (a.pace === "It doesn’t matter") s += 1;
+
       return { c, s };
     })
     .sort((x, y) => y.s - x.s)
@@ -77,8 +95,20 @@ function score(a: Partial<Answer>): Church[] {
 function Quiz() {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Partial<Answer>>({});
+  const [churches, setChurches] = useState<Church[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchChurches = async () => {
+      const { churches: data } = await getChurches({ limit: 100 });
+      setChurches(data);
+      setLoading(false);
+    };
+    fetchChurches();
+  }, []);
+
   const done = step >= questions.length;
-  const matches = useMemo(() => (done ? score(answers) : []), [done, answers]);
+  const matches = useMemo(() => (done && !loading ? score(answers, churches) : []), [done, loading, answers, churches]);
 
   if (done) {
     return (
