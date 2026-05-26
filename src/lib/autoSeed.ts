@@ -21,6 +21,7 @@ const DEMO_CHURCHES = [
     verified: true,
     featured: true,
     active: true,
+    profile_image_url: 'https://images.unsplash.com/photo-1438747668470-552f029e1994?w=1024&h=1280&fit=crop',
   },
   {
     name: 'Grace Baptist Fellowship',
@@ -42,6 +43,7 @@ const DEMO_CHURCHES = [
     verified: true,
     featured: true,
     active: true,
+    profile_image_url: 'https://images.unsplash.com/photo-1516214104703-3e461bfb9f38?w=1024&h=1280&fit=crop',
   },
   {
     name: 'Hope Orthodox Cathedral',
@@ -63,6 +65,7 @@ const DEMO_CHURCHES = [
     verified: true,
     featured: true,
     active: true,
+    profile_image_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1024&h=1280&fit=crop',
   },
   {
     name: 'New Life Pentecostal Church',
@@ -84,6 +87,7 @@ const DEMO_CHURCHES = [
     verified: false,
     featured: true,
     active: true,
+    profile_image_url: 'https://images.unsplash.com/photo-1533461502717-83546f485c90?w=1024&h=1280&fit=crop',
   },
   {
     name: 'Cornerstone Presbyterian Church',
@@ -105,6 +109,7 @@ const DEMO_CHURCHES = [
     verified: true,
     featured: false,
     active: true,
+    profile_image_url: 'https://images.unsplash.com/photo-1470229722519-ccf4ee4b6138?w=1024&h=1280&fit=crop',
   },
   {
     name: 'Faith Methodist Chapel',
@@ -126,6 +131,7 @@ const DEMO_CHURCHES = [
     verified: true,
     featured: false,
     active: true,
+    profile_image_url: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1024&h=1280&fit=crop',
   },
   {
     name: 'Living Waters Anglican Church',
@@ -147,6 +153,7 @@ const DEMO_CHURCHES = [
     verified: false,
     featured: false,
     active: true,
+    profile_image_url: 'https://images.unsplash.com/photo-1504680869281-eb83b21c63cc?w=1024&h=1280&fit=crop',
   },
   {
     name: 'Abundant Grace Assembly',
@@ -168,6 +175,7 @@ const DEMO_CHURCHES = [
     verified: true,
     featured: true,
     active: true,
+    profile_image_url: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1024&h=1280&fit=crop',
   },
 ];
 
