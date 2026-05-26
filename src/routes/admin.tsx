@@ -12,36 +12,25 @@ export const Route = createFileRoute("/admin")({
 function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // localStorage is only available on client-side
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem("admin_token");
-      if (token && isValidAdminToken(token)) {
-        setIsAuthenticated(true);
-      }
+    setMounted(true);
+    const token = localStorage.getItem("admin_token");
+    if (token && isValidAdminToken(token)) {
+      setIsAuthenticated(true);
     }
     setLoading(false);
   }, []);
 
-  const handleLogin = (password: string) => {
-    if (validateAdminPassword(password)) {
-      const token = generateAdminToken();
-      if (typeof window !== 'undefined') {
-        localStorage.setItem("admin_token", token);
-      }
-      setIsAuthenticated(true);
-      return true;
-    }
-    return false;
-  };
-
-  const handleLogout = () => {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem("admin_token");
-    }
-    setIsAuthenticated(false);
-  };
+  // Don't render anything until component is mounted on client
+  if (!mounted) {
+    return (
+      <div className="bg-cream text-emerald-deep min-h-screen flex items-center justify-center">
+        <p>Loading...</p>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
@@ -50,6 +39,21 @@ function AdminPage() {
       </div>
     );
   }
+
+  const handleLogin = (password: string) => {
+    if (validateAdminPassword(password)) {
+      const token = generateAdminToken();
+      localStorage.setItem("admin_token", token);
+      setIsAuthenticated(true);
+      return true;
+    }
+    return false;
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("admin_token");
+    setIsAuthenticated(false);
+  };
 
   if (!isAuthenticated) {
     return <AdminLogin onLogin={handleLogin} />;
