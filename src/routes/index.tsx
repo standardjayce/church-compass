@@ -8,6 +8,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { ChurchCard } from "@/components/church-card";
 import { MapPin, Church as ChurchIcon, Search } from "lucide-react";
 import { getChurches } from "@/lib/churchQueries";
+import { ensureDemoData } from "@/lib/autoSeed";
 import type { Church } from "@/types/church";
 
 export const Route = createFileRoute("/")({
@@ -33,6 +34,7 @@ function Index() {
   useEffect(() => {
     const fetchFeatured = async () => {
       setLoading(true);
+      await ensureDemoData();
       const { churches } = await getChurches({ featured: true, limit: 3 });
       setFeatured(churches);
       setLoading(false);
