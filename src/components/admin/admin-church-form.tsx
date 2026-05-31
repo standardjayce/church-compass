@@ -1,6 +1,6 @@
 import { useState } from "react";
-import type { Church } from "@/types/church";
-import { ArrowLeft } from "lucide-react";
+import type { Church, GivingMethod } from "@/types/church";
+import { ArrowLeft, Plus, X } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 
 interface AdminChurchFormProps {
@@ -12,6 +12,13 @@ interface AdminChurchFormProps {
 export function AdminChurchForm({ church, onClose, onSave }: AdminChurchFormProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [givingMethods, setGivingMethods] = useState<GivingMethod[]>(church?.giving_methods || []);
+  const [newGivingMethod, setNewGivingMethod] = useState<GivingMethod>({
+    name: "",
+    description: "",
+    url: "",
+    app_name: "",
+  });
   const [formData, setFormData] = useState({
     name: church?.name || "",
     slug: church?.slug || "",
@@ -37,21 +44,48 @@ export function AdminChurchForm({ church, onClose, onSave }: AdminChurchFormProp
     });
   };
 
+  const handleGivingMethodChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setNewGivingMethod({
+      ...newGivingMethod,
+      [name]: value,
+    });
+  };
+
+  const addGivingMethod = () => {
+    if (!newGivingMethod.name.trim()) {
+      setError("Giving method name is required");
+      return;
+    }
+    setGivingMethods([...givingMethods, { ...newGivingMethod }]);
+    setNewGivingMethod({ name: "", description: "", url: "", app_name: "" });
+    setError("");
+  };
+
+  const removeGivingMethod = (index: number) => {
+    setGivingMethods(givingMethods.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
     try {
+      const dataToSave = {
+        ...formData,
+        giving_methods: givingMethods,
+      };
+
       if (church?.id) {
         const { error: updateError } = await supabase
           .from("churches")
-          .update(formData)
+          .update(dataToSave)
           .eq("id", church.id);
 
         if (updateError) throw updateError;
       } else {
-        const { error: insertError } = await supabase.from("churches").insert([formData]);
+        const { error: insertError } = await supabase.from("churches").insert([dataToSave]);
 
         if (insertError) throw insertError;
       }
@@ -245,6 +279,96 @@ export function AdminChurchForm({ church, onClose, onSave }: AdminChurchFormProp
             />
             <span className="text-sm font-medium">Featured on homepage</span>
           </label>
+        </div>
+
+        <div className="border-t border-emerald-deep/10 pt-6">
+          <h3 className="text-lg font-medium mb-4 flex items-center gap-2">
+            <span>Ways to Give</span>
+          </h3>
+
+          {givingMethods.length > 0 && (
+            <div className="space-y-3 mb-6">
+              {givingMethods.map((method, index) => (
+                <div key={index} className="p-3 bg-emerald-deep/5 border border-emerald-deep/10 rounded-sm">
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1">
+                      <p className="font-medium text-emerald-deep">{method.name}</p>
+                      {method.description && <p className="text-sm text-emerald-deep/70">{method.description}</p>}
+                      {method.app_name && <p className="text-xs text-emerald-deep/60">App: {method.app_name}</p>}
+                      {method.url && <p className="text-xs text-gold break-all">{method.url}</p>}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeGivingMethod(index)}
+                      className="ml-2 p-1 text-red-600 hover:bg-red-50 rounded"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="space-y-3 p-4 border border-emerald-deep/10 rounded-sm bg-emerald-deep/5">
+            <div>
+              <label className="block text-sm font-medium mb-2">Giving Method Name</label>
+              <input
+                type="text"
+                name="name"
+                value={newGivingMethod.name}
+                onChange={handleGivingMethodChange}
+                placeholder="e.g., Online Giving Portal, Venmo, PayPal"
+                className="w-full h-10 px-3 border border-emerald-deep/20 rounded-sm focus:outline-none focus:ring-2 focus:ring-gold"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">Description</label>
+              <input
+                type="text"
+                name="description"
+                value={newGivingMethod.description || ""}
+                onChange={handleGivingMethodChange}
+                placeholder="e.g., Secure online giving for one-time or recurring gifts"
+                className="w-full h-10 px-3 border border-emerald-deep/20 rounded-sm focus:outline-none focus:ring-2 focus:ring-gold"
+              />
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">URL</label>
+                <input
+                  type="url"
+                  name="url"
+                  value={newGivingMethod.url || ""}
+                  onChange={handleGivingMethodChange}
+                  placeholder="https://..."
+                  className="w-full h-10 px-3 border border-emerald-deep/20 rounded-sm focus:outline-none focus:ring-2 focus:ring-gold"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">App Name</label>
+                <input
+                  type="text"
+                  name="app_name"
+                  value={newGivingMethod.app_name || ""}
+                  onChange={handleGivingMethodChange}
+                  placeholder="e.g., Venmo @churchname, PayPal"
+                  className="w-full h-10 px-3 border border-emerald-deep/20 rounded-sm focus:outline-none focus:ring-2 focus:ring-gold"
+                />
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={addGivingMethod}
+              className="w-full flex items-center justify-center gap-2 py-2 text-sm font-medium text-emerald-deep border border-emerald-deep/20 hover:border-gold rounded-sm transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              Add Giving Method
+            </button>
+          </div>
         </div>
 
         <div className="flex gap-4">

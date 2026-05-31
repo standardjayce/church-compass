@@ -31,6 +31,7 @@ export type Church = {
   parking_info: string | null
   profile_image_url: string | null
   gallery_urls: string[]
+  giving_methods: GivingMethod[]
   verified: boolean
   claimed: boolean
   featured: boolean
@@ -42,6 +43,13 @@ export type Church = {
 export type ServiceTime = {
   day: string
   time: string
+}
+
+export type GivingMethod = {
+  name: string
+  description?: string
+  url?: string
+  app_name?: string
 }
 
 export type ChurchClaim = {

@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-ro
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
 import { ContactForm } from "@/components/contact-form";
+import { ChurchWaysToGive } from "@/components/church-ways-to-give";
 import { getChurchBySlug } from "@/lib/churchQueries";
 
 export const Route = createFileRoute("/church/$slug")({
@@ -119,6 +120,12 @@ function ChurchDetail() {
               </div>
             </aside>
           </div>
+
+          {church.giving_methods && church.giving_methods.length > 0 && (
+            <div className="mt-20 pt-20 border-t border-emerald-deep/10">
+              <ChurchWaysToGive givingMethods={church.giving_methods} />
+            </div>
+          )}
 
           <div className="mt-20 pt-20 border-t border-emerald-deep/10">
             <ContactForm church={church} />
